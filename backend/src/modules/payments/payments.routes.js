@@ -1,0 +1,12 @@
+import { Router } from 'express';
+import { PaymentsController } from './payments.controller.js';
+import { authenticate } from '../../middlewares/auth.middleware.js';
+import { validateRequest } from '../../middlewares/validate.middleware.js';
+import { createOrderSchema, verifyPaymentSchema } from './payments.validation.js';
+const router = Router();
+const controller = new PaymentsController();
+router.use(authenticate);
+router.post('/orders', validateRequest({ body: createOrderSchema }), controller.createOrder);
+router.post('/verify', validateRequest({ body: verifyPaymentSchema }), controller.verifyPayment);
+router.get('/receipt/:bookingId', controller.getReceipt);
+export default router;

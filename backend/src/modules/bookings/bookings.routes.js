@@ -1,0 +1,17 @@
+import { Router } from 'express';
+import { BookingsController } from './bookings.controller.js';
+import { authenticate } from '../../middlewares/auth.middleware.js';
+import { validateRequest } from '../../middlewares/validate.middleware.js';
+import { createBookingSchema, respondBookingSchema, verifyOtpSchema, cancelBookingSchema, } from './bookings.validation.js';
+const router = Router();
+const controller = new BookingsController();
+router.use(authenticate);
+router.post('/', validateRequest({ body: createBookingSchema }), controller.createBooking);
+router.get('/my-bookings', controller.getMyBookings);
+router.get('/:id', controller.getBookingById);
+router.post('/:id/respond', validateRequest({ body: respondBookingSchema }), controller.respondToBooking);
+router.post('/:id/arrived', controller.markArrived);
+router.post('/:id/verify-otp', validateRequest({ body: verifyOtpSchema }), controller.verifyOtpAndStart);
+router.post('/:id/complete', controller.completeRide);
+router.post('/:id/cancel', validateRequest({ body: cancelBookingSchema }), controller.cancelBooking);
+export default router;

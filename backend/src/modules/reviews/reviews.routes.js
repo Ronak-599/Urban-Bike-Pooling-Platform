@@ -1,0 +1,11 @@
+import { Router } from 'express';
+import { ReviewsController } from './reviews.controller.js';
+import { authenticate } from '../../middlewares/auth.middleware.js';
+import { validateRequest } from '../../middlewares/validate.middleware.js';
+import { createReviewSchema } from './reviews.validation.js';
+const router = Router();
+const controller = new ReviewsController();
+router.use(authenticate);
+router.post('/', validateRequest({ body: createReviewSchema }), controller.submitReview);
+router.get('/user/:userId', controller.getUserReviews);
+export default router;

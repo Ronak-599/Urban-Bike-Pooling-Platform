@@ -1,0 +1,229 @@
+[
+    {
+        "Id": "f7329bf4b09cb243e50e1821bc42414920ce640240cdfbf3a552a28cb225cb42",
+        "Created": "2026-09-07T16:43:25.180163862Z",
+        "Path": "docker-entrypoint.sh",
+        "Args": [
+            "postgres"
+        ],
+        "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 13971,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2026-09-07T16:45:32.029641945Z",
+            "FinishedAt": "0001-01-01T00:00:00Z"
+        },
+        "Image": "sha256:44126d872ac91993766c341e369c539e8196614321765d36a6f1bab0419a5fa5",
+        "ResolvConfPath": "/var/lib/docker/containers/f7329bf4b09cb243e50e1821bc42414920ce640240cdfbf3a552a28cb225cb42/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/f7329bf4b09cb243e50e1821bc42414920ce640240cdfbf3a552a28cb225cb42/hostname",
+        "HostsPath": "/var/lib/docker/containers/f7329bf4b09cb243e50e1821bc42414920ce640240cdfbf3a552a28cb225cb42/hosts",
+        "LogPath": "/var/lib/docker/containers/f7329bf4b09cb243e50e1821bc42414920ce640240cdfbf3a552a28cb225cb42/f7329bf4b09cb243e50e1821bc42414920ce640240cdfbf3a552a28cb225cb42-json.log",
+        "Name": "/twoshare-postgres",
+        "RestartCount": 0,
+        "Driver": "overlayfs",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": [
+                "urbanbikepoolingplatform_postgres_data:/var/lib/postgresql/data:rw"
+            ],
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "urbanbikepoolingplatform_default",
+            "PortBindings": {
+                "5432/tcp": [
+                    {
+                        "HostIp": "",
+                        "HostPort": "5432"
+                    }
+                ]
+            },
+            "RestartPolicy": {
+                "Name": "unless-stopped",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "CapAdd": null,
+            "CapDrop": null,
+            "CgroupnsMode": "private",
+            "Dns": null,
+            "DnsOptions": null,
+            "DnsSearch": null,
+            "ExtraHosts": [],
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": null,
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 0,
+            "NanoCpus": 0,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": null,
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": null,
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "MemoryReservation": 0,
+            "MemorySwap": 0,
+            "MemorySwappiness": null,
+            "OomKillDisable": null,
+            "PidsLimit": null,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "MaskedPaths": [
+                "/proc/acpi",
+                "/proc/asound",
+                "/proc/interrupts",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/sys/devices/virtual/powercap",
+                "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        },
+        "Storage": {
+            "RootFS": {
+                "Snapshot": {
+                    "Name": "overlayfs"
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "volume",
+                "Name": "urbanbikepoolingplatform_postgres_data",
+                "Source": "/var/lib/docker/volumes/urbanbikepoolingplatform_postgres_data/_data",
+                "Destination": "/var/lib/postgresql/data",
+                "Driver": "local",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": ""
+            }
+        ],
+        "Config": {
+            "Hostname": "f7329bf4b09c",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": true,
+            "AttachStderr": true,
+            "ExposedPorts": {
+                "5432/tcp": {}
+            },
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "POSTGRES_DB=twoshare_db",
+                "POSTGRES_USER=postgres",
+                "POSTGRES_PASSWORD=postgres",
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/postgresql/16/bin",
+                "GOSU_VERSION=1.17",
+                "LANG=en_US.utf8",
+                "PG_MAJOR=16",
+                "PG_VERSION=16.4-1.pgdg110+2",
+                "PGDATA=/var/lib/postgresql/data",
+                "POSTGIS_MAJOR=3",
+                "POSTGIS_VERSION=3.4.3+dfsg-2.pgdg110+1"
+            ],
+            "Cmd": [
+                "postgres"
+            ],
+            "Image": "postgis/postgis:16-3.4",
+            "Volumes": {
+                "/var/lib/postgresql/data": {}
+            },
+            "WorkingDir": "",
+            "Entrypoint": [
+                "docker-entrypoint.sh"
+            ],
+            "Labels": {
+                "com.docker.compose.config-hash": "35b9d2e58f2567d2585b45f74304869741b84ab866ebbd3360595d439e05e994",
+                "com.docker.compose.container-number": "1",
+                "com.docker.compose.depends_on": "",
+                "com.docker.compose.image": "sha256:44126d872ac91993766c341e369c539e8196614321765d36a6f1bab0419a5fa5",
+                "com.docker.compose.oneoff": "False",
+                "com.docker.compose.project": "urbanbikepoolingplatform",
+                "com.docker.compose.project.config_files": "D:\\Urban Bike Pooling Platform\\docker-compose.yml",
+                "com.docker.compose.project.working_dir": "D:\\Urban Bike Pooling Platform",
+                "com.docker.compose.service": "postgres",
+                "com.docker.compose.version": "5.1.0",
+                "maintainer": "PostGIS Project - https://postgis.net",
+                "org.opencontainers.image.description": "PostGIS 3.4.3+dfsg-2.pgdg110+1 spatial database extension with PostgreSQL 16 bullseye",
+                "org.opencontainers.image.source": "https://github.com/postgis/docker-postgis"
+            },
+            "StopSignal": "SIGINT",
+            "StopTimeout": 1
+        },
+        "NetworkSettings": {
+            "SandboxID": "faad0332cc4a57941d2df4011e43d9a025659843064164a4028fdaddd8f55e68",
+            "SandboxKey": "/var/run/docker/netns/faad0332cc4a",
+            "Ports": {
+                "5432/tcp": []
+            },
+            "Networks": {}
+        },
+        "ImageManifestDescriptor": {
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "digest": "sha256:44126d872ac91993766c341e369c539e8196614321765d36a6f1bab0419a5fa5",
+            "size": 4078,
+            "platform": {
+                "architecture": "amd64",
+                "os": "linux"
+            }
+        }
+    }
+]
