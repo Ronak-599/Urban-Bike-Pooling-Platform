@@ -443,7 +443,7 @@ export const Home: React.FC = () => {
             </div>
             <h3 className="text-lg font-bold text-slate-900 dark:text-white">Auto Fuel Split & Escrow Release</h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Payments are held securely in escrow and automatically transferred to the rider's wallet upon safe drop-off.
+              Payments are held securely in escrow and automatically transferred to the rider upon safe drop-off.
             </p>
           </Card>
         </div>

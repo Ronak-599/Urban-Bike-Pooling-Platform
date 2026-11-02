@@ -100,7 +100,7 @@ export const BookingConfirmation: React.FC = () => {
   if (!booking) {
     return (
       <div className="max-w-xl mx-auto py-16 text-center space-y-4">
-        <h2 className="text-xl font-bold text-white">Booking Not Found</h2>
+        <h2 className="text-xl font-bold text-slate-900 dark:text-white">Booking Not Found</h2>
         <Button variant="secondary" onClick={() => navigate('/search')}>
           Search Rides
         </Button>
@@ -122,8 +122,8 @@ export const BookingConfirmation: React.FC = () => {
       {/* Top Banner with Status */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <span className="text-xs text-slate-400 font-mono">Booking #{booking.id.slice(0, 8)}</span>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">Booking #{booking.id.slice(0, 8)}</span>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
             {isPending ? 'Booking Request Submitted' : 'Ride Booking & Confirmation'}
           </h1>
         </div>
@@ -269,8 +269,8 @@ export const BookingConfirmation: React.FC = () => {
           <div className="w-12 h-12 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto">
             <XCircle className="w-6 h-6" />
           </div>
-          <h2 className="text-lg font-bold text-white">Booking Request Declined</h2>
-          <p className="text-xs text-slate-300 max-w-md mx-auto">
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white">Booking Request Declined</h2>
+          <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto">
             The host was unable to accept this booking request for their schedule. No funds have been charged to your account.
           </p>
           <div className="pt-2">
@@ -283,12 +283,12 @@ export const BookingConfirmation: React.FC = () => {
 
       {/* 4. STATE: CANCELLED */}
       {isCancelled && (
-        <div className="p-6 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-3 text-center">
-          <div className="w-12 h-12 rounded-full bg-slate-700 text-slate-300 flex items-center justify-center mx-auto">
+        <div className="p-6 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 space-y-3 text-center">
+          <div className="w-12 h-12 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center mx-auto">
             <Ban className="w-6 h-6" />
           </div>
-          <h2 className="text-lg font-bold text-white">Ride Cancelled</h2>
-          <p className="text-xs text-slate-400 max-w-md mx-auto">
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white">Ride Cancelled</h2>
+          <p className="text-xs text-slate-600 dark:text-slate-400 max-w-md mx-auto">
             {booking.cancellationReason || 'This booking or ride offer was cancelled.'}
           </p>
           <div className="pt-2">
@@ -301,31 +301,30 @@ export const BookingConfirmation: React.FC = () => {
 
       {/* Live Rider Approach & Telemetry */}
       {['CONFIRMED', 'ARRIVED', 'STARTED'].includes(booking.status) && (
-        <Card className="p-5 border-slate-800 space-y-3">
+        <Card className="p-5 border-slate-200 dark:border-slate-800 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-xs font-bold text-white uppercase tracking-wider">
+              <div className="w-3 h-3 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
+              <span className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
                 Live GPS Telemetry ({isConnected ? 'Connected' : 'Syncing'})
               </span>
             </div>
             {riderLocation && (
-              <span className="text-xs font-mono text-emerald-400">
+              <span className="text-xs font-mono text-emerald-600 dark:text-emerald-400">
                 Speed: {riderLocation.speedKmh.toFixed(1)} km/h
               </span>
             )}
           </div>
-
-          <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300 flex items-center justify-between">
+          <div className="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Navigation className="w-4 h-4 text-emerald-400" />
+              <Navigation className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
               <span>
                 {booking.status === 'ARRIVED'
                   ? 'Host has arrived at your curbside pickup spot'
                   : 'Host is en-route to curbside pickup spot'}
               </span>
             </div>
-            <span className="text-emerald-400 font-semibold">
+            <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
               {booking.status === 'ARRIVED' ? 'Arrived Now' : 'ETA ~3 mins'}
             </span>
           </div>
@@ -333,21 +332,21 @@ export const BookingConfirmation: React.FC = () => {
       )}
 
       {/* Trip & Vehicle Details */}
-      <Card className="p-6 border-slate-800 space-y-4">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+      <Card className="p-6 border-slate-200 dark:border-slate-800 space-y-4">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
           Trip & Host Summary
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
           <div>
             <span className="text-slate-500 block">Rider Name</span>
-            <span className="font-bold text-white text-sm">{rider?.fullName}</span>
+            <span className="font-bold text-slate-900 dark:text-white text-sm">{rider?.fullName}</span>
             <div className="flex items-center gap-2 mt-0.5">
-              <span className="text-amber-400 font-semibold">★ {Number(rider?.ratingAvg || 5).toFixed(1)}</span>
+              <span className="text-amber-500 font-semibold">★ {Number(rider?.ratingAvg || 5).toFixed(1)}</span>
               {isConfirmed && rider?.phoneNumber && (
                 <a
                   href={`tel:${rider.phoneNumber}`}
-                  className="text-emerald-400 hover:text-emerald-300 font-medium flex items-center gap-1 ml-2"
+                  className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 font-medium flex items-center gap-1 ml-2"
                 >
                   <Phone className="w-3 h-3" />
                   <span>Call Rider</span>
@@ -358,23 +357,23 @@ export const BookingConfirmation: React.FC = () => {
 
           <div>
             <span className="text-slate-500 block">Motorcycle / License Plate</span>
-            <span className="font-bold text-white text-sm">{vehicle?.make} {vehicle?.model}</span>
-            <span className="text-emerald-400 font-mono block mt-0.5">{vehicle?.licensePlate}</span>
+            <span className="font-bold text-slate-900 dark:text-white text-sm">{vehicle?.make} {vehicle?.model}</span>
+            <span className="text-emerald-600 dark:text-emerald-400 font-mono block mt-0.5">{vehicle?.licensePlate}</span>
           </div>
         </div>
 
-        <div className="border-t border-slate-800/80 pt-4 space-y-2 text-xs">
-          <div className="flex justify-between text-slate-400">
+        <div className="border-t border-slate-200 dark:border-slate-800/80 pt-4 space-y-2 text-xs">
+          <div className="flex justify-between text-slate-600 dark:text-slate-400">
             <span>Pickup Spot</span>
-            <span className="text-white font-medium text-right">{booking.pickupAddress}</span>
+            <span className="text-slate-900 dark:text-white font-medium text-right">{booking.pickupAddress}</span>
           </div>
-          <div className="flex justify-between text-slate-400">
+          <div className="flex justify-between text-slate-600 dark:text-slate-400">
             <span>Destination</span>
-            <span className="text-white font-medium text-right">{booking.dropoffAddress}</span>
+            <span className="text-slate-900 dark:text-white font-medium text-right">{booking.dropoffAddress}</span>
           </div>
-          <div className="flex justify-between text-slate-400">
+          <div className="flex justify-between text-slate-600 dark:text-slate-400">
             <span>Scheduled Time</span>
-            <span className="text-white font-medium">{formatDate(booking.ride?.scheduledDeparture)}</span>
+            <span className="text-slate-900 dark:text-white font-medium">{formatDate(booking.ride?.scheduledDeparture)}</span>
           </div>
         </div>
       </Card>

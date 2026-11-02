@@ -67,19 +67,8 @@ async function runTest() {
             },
         });
         console.log('   Vehicle Created:', vehicle.id, vehicle.make, vehicle.model);
-        // 4. Create Host Wallet
-        console.log('💳 4. Creating Rider Wallet...');
-        const hostWallet = await prisma.wallet.create({
-            data: {
-                userId: hostUser.id,
-                currency: 'INR',
-                currentBalance: 0.0,
-                lockedEscrowBalance: 0.0,
-            },
-        });
-        console.log('   Wallet Created:', hostWallet.id);
-        // 5. Create Ride Offer
-        console.log('🗺️ 5. Publishing Ride Offer...');
+        // 4. Create Ride Offer
+        console.log('🗺️ 4. Publishing Ride Offer...');
         const departureTime = new Date(Date.now() + 3600000); // 1 hour from now
         const ride = await prisma.ride.create({
             data: {
@@ -102,8 +91,8 @@ async function runTest() {
             },
         });
         console.log('   Ride Offer Published:', ride.id, 'Fare per km:', ride.perKmCostShare);
-        // 6. Create Passenger User
-        console.log('👥 6. Creating Passenger User...');
+        // 5. Create Passenger User
+        console.log('👥 5. Creating Passenger User...');
         const passenger = await prisma.user.create({
             data: {
                 phoneNumber: '+919123456789',
@@ -115,8 +104,8 @@ async function runTest() {
             },
         });
         console.log('   Passenger Created:', passenger.id, passenger.fullName);
-        // 7. Create Booking
-        console.log('🎫 7. Creating Passenger Booking Request...');
+        // 6. Create Booking
+        console.log('🎫 6. Creating Passenger Booking Request...');
         const booking = await prisma.booking.create({
             data: {
                 rideId: ride.id,
@@ -136,8 +125,8 @@ async function runTest() {
             },
         });
         console.log('   Booking Created:', booking.id, 'OTP:', booking.pickupOtp, 'Total fare:', booking.totalFare);
-        // 8. Test Multi-Document ACID Transaction (Simulating Confirmation & Seat Reservation)
-        console.log('🔒 8. Executing Multi-Document Transaction on MongoDB (Accept Booking & Reserve Seat)...');
+        // 7. Test Multi-Document ACID Transaction (Simulating Confirmation & Seat Reservation)
+        console.log('🔒 7. Executing Multi-Document Transaction on MongoDB (Accept Booking & Reserve Seat)...');
         const result = await prisma.$transaction(async (tx) => {
             const updatedBooking = await tx.booking.update({
                 where: { id: booking.id },
@@ -161,13 +150,13 @@ async function runTest() {
             return updatedBooking;
         });
         console.log('   Transaction completed successfully. Booking status:', result.status);
-        // 9. Verify Seat Decrement
+        // 8. Verify Seat Decrement
         const updatedRide = await prisma.ride.findUnique({ where: { id: ride.id } });
         console.log('   Updated Ride Available Seats:', updatedRide?.availableSeats);
         if (updatedRide?.availableSeats !== 0) {
             throw new Error('Seats were not updated properly in transaction!');
         }
-        // 10. Complete Ride & Post Review with Rating Recalculation Transaction
+        // 9. Complete Ride & Post Review with Rating Recalculation Transaction
         console.log('⭐ 9. Completing Ride and Submitting Review...');
         await prisma.$transaction(async (tx) => {
             await tx.booking.update({

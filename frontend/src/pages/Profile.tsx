@@ -138,10 +138,10 @@ export const Profile: React.FC = () => {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
           Profile & Account Verification
         </h1>
-        <p className="text-xs sm:text-sm text-slate-400">
+        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
           Manage your credentials, vehicles, and emergency contacts
         </p>
       </div>
@@ -149,15 +149,15 @@ export const Profile: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left Column: Personal info & Emergency contacts */}
         <div className="lg:col-span-6 space-y-6">
-          <Card className="p-6 border-slate-800 space-y-4">
+          <Card className="p-6 border-slate-200 dark:border-slate-800 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-bold text-base">
+                <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-bold text-base">
                   {user.fullName.slice(0, 2).toUpperCase()}
                 </div>
                 <div>
-                  <h3 className="font-bold text-white">{user.fullName}</h3>
-                  <span className="text-xs text-slate-400 font-mono">{user.phoneNumber}</span>
+                  <h3 className="font-bold text-slate-900 dark:text-white">{user.fullName}</h3>
+                  <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">{user.phoneNumber}</span>
                 </div>
               </div>
 
@@ -216,9 +216,9 @@ export const Profile: React.FC = () => {
                 {contacts.map((c) => (
                   <div key={c.id} className="p-3 rounded-xl glass-panel flex items-center justify-between text-xs">
                     <div>
-                      <span className="font-bold text-white">{c.contactName}</span>
+                      <span className="font-bold text-slate-900 dark:text-white">{c.contactName}</span>
                       <span className="text-slate-500 ml-2">({c.relationship})</span>
-                      <div className="text-slate-400 font-mono text-[11px]">{c.phoneNumber}</div>
+                      <div className="text-slate-500 dark:text-slate-400 font-mono text-[11px]">{c.phoneNumber}</div>
                     </div>
                     {c.isPrimary && <Badge variant="secondary">Primary</Badge>}
                   </div>
@@ -234,11 +234,11 @@ export const Profile: React.FC = () => {
 
         {/* Right Column: Registered Vehicles & Rider Credentials */}
         <div className="lg:col-span-6 space-y-6">
-          <Card className="p-6 border-slate-800 space-y-4">
+          <Card className="p-6 border-slate-200 dark:border-slate-800 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Bike className="w-4 h-4 text-emerald-400" />
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300">
+                <Bike className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                   Registered Two-Wheelers ({vehicles.length})
                 </h3>
               </div>
@@ -252,13 +252,13 @@ export const Profile: React.FC = () => {
             {vehicles.length > 0 ? (
               <div className="space-y-3">
                 {vehicles.map((v) => (
-                  <div key={v.id} className="p-4 rounded-xl glass-panel space-y-2 text-xs border border-slate-800">
+                  <div key={v.id} className="p-4 rounded-xl glass-panel space-y-2 text-xs border border-slate-200 dark:border-slate-800">
                     <div className="flex justify-between items-start">
                       <div>
-                        <div className="font-bold text-white text-sm">
+                        <div className="font-bold text-slate-900 dark:text-white text-sm">
                           {v.make} {v.model} ({v.color})
                         </div>
-                        <div className="text-emerald-400 font-mono font-semibold">{v.licensePlate}</div>
+                        <div className="text-emerald-600 dark:text-emerald-400 font-mono font-semibold">{v.licensePlate}</div>
                       </div>
                       <Badge variant="success">Verified RC</Badge>
                     </div>
@@ -283,11 +283,11 @@ export const Profile: React.FC = () => {
 
       {/* Add Vehicle Modal */}
       {showVehicleModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-          <Card className="max-w-md w-full p-6 border-slate-800 space-y-4">
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4">
+          <Card className="max-w-md w-full p-6 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-4">
             <div className="flex justify-between items-center">
-              <h3 className="font-bold text-white text-base">Register Two-Wheeler</h3>
-              <button onClick={() => setShowVehicleModal(false)} className="text-slate-400 hover:text-white">
+              <h3 className="font-bold text-slate-900 dark:text-white text-base">Register Two-Wheeler</h3>
+              <button onClick={() => setShowVehicleModal(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-white">
                 ✕
               </button>
             </div>
@@ -356,11 +356,11 @@ export const Profile: React.FC = () => {
 
       {/* Add Contact Modal */}
       {showContactModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-          <Card className="max-w-md w-full p-6 border-slate-800 space-y-4">
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4">
+          <Card className="max-w-md w-full p-6 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-4">
             <div className="flex justify-between items-center">
-              <h3 className="font-bold text-white text-base">Add Emergency Contact</h3>
-              <button onClick={() => setShowContactModal(false)} className="text-slate-400 hover:text-white">
+              <h3 className="font-bold text-slate-900 dark:text-white text-base">Add Emergency Contact</h3>
+              <button onClick={() => setShowContactModal(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-white">
                 ✕
               </button>
             </div>

@@ -8,7 +8,6 @@ import {
   Search,
   PlusCircle,
   Clock,
-  Wallet,
   User,
   LogOut,
   Menu,
@@ -16,7 +15,6 @@ import {
   Sun,
   Moon,
 } from 'lucide-react';
-import { formatCurrency } from '../lib/utils.js';
 
 export const Navbar: React.FC = () => {
   const { user, logout } = useAuthStore();
@@ -84,23 +82,6 @@ export const Navbar: React.FC = () => {
                 >
                   <Clock className="w-4 h-4" />
                   <span>My Trips</span>
-                </Link>
-
-                <Link
-                  to="/wallet"
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium transition-colors ${
-                    isActive('/wallet')
-                      ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800/60'
-                  }`}
-                >
-                  <Wallet className="w-4 h-4" />
-                  <span>Wallet</span>
-                  {user.wallet && (
-                    <span className="ml-1 px-2 py-0.5 text-xs rounded-full bg-slate-100 text-emerald-700 font-semibold border border-slate-200 dark:bg-slate-800 dark:text-emerald-400 dark:border-slate-700">
-                      {formatCurrency(user.wallet.currentBalance)}
-                    </span>
-                  )}
                 </Link>
               </>
             )}
@@ -218,14 +199,6 @@ export const Navbar: React.FC = () => {
               >
                 <Clock className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
                 <span>My Trips</span>
-              </Link>
-              <Link
-                to="/wallet"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 text-sm font-medium"
-              >
-                <Wallet className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
-                <span>Wallet ({user.wallet ? formatCurrency(user.wallet.currentBalance) : '₹0'})</span>
               </Link>
               <Link
                 to="/profile"

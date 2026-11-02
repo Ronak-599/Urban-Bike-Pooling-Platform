@@ -26,7 +26,6 @@ export const Footer: React.FC = () => {
             <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-400">
               <li><Link to="/search" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Find a Commute Ride</Link></li>
               <li><Link to="/offer" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Publish Your Daily Route</Link></li>
-              <li><Link to="/wallet" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Commute Wallet & Passes</Link></li>
               <li><Link to="/trips" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Live Ride Tracking</Link></li>
             </ul>
           </div>

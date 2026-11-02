@@ -56,13 +56,4 @@ export class UsersController {
             next(error);
         }
     }
-    async getWallet(req, res, next) {
-        try {
-            const wallet = await usersService.getWallet(req.user.userId);
-            sendSuccess(res, wallet, 'Wallet details retrieved');
-        }
-        catch (error) {
-            next(error);
-        }
-    }
 }

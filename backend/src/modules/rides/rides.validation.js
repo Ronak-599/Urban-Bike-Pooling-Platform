@@ -12,7 +12,7 @@ export const createRideSchema = z.object({
     bufferMinutes: z.number().int().min(0).max(30).default(10),
     helmetProvided: z.boolean().default(true),
     isWomenOnly: z.boolean().default(false),
-    perKmCostShare: z.number().positive().max(15.0), // Statutory cost ceiling
+    perKmCostShare: z.number().positive().max(1000.0), // Flexible per-km share or direct cost derived rate
     estimatedDistanceMeters: z.number().int().positive(),
     estimatedDurationSeconds: z.number().int().positive(),
     recurringCron: z.string().optional(),

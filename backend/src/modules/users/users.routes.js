@@ -13,5 +13,4 @@ router.post('/rider-profile', validateRequest({ body: createRiderProfileSchema }
 router.post('/vehicles', validateRequest({ body: createVehicleSchema }), controller.addVehicle);
 router.get('/emergency-contacts', controller.getEmergencyContacts);
 router.post('/emergency-contacts', validateRequest({ body: addEmergencyContactSchema }), controller.addEmergencyContact);
-router.get('/wallet', controller.getWallet);
 export default router;

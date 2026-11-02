@@ -18,14 +18,6 @@ export class UsersService {
                 ratingCount: true,
                 isActive: true,
                 createdAt: true,
-                wallet: {
-                    select: {
-                        id: true,
-                        currency: true,
-                        currentBalance: true,
-                        lockedEscrowBalance: true,
-                    },
-                },
                 emergencyContacts: true,
                 riderProfile: {
                     include: {
@@ -142,20 +134,5 @@ export class UsersService {
             where: { userId },
             orderBy: { isPrimary: 'desc' },
         });
-    }
-    async getWallet(userId) {
-        const wallet = await prisma.wallet.findUnique({
-            where: { userId },
-            include: {
-                transactions: {
-                    take: 20,
-                    orderBy: { createdAt: 'desc' },
-                },
-            },
-        });
-        if (!wallet) {
-            throw new NotFoundError('Wallet not found');
-        }
-        return wallet;
     }
 }

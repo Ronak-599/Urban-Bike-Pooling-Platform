@@ -71,10 +71,6 @@ class ApiClient {
     return this.request<any>('/users/emergency-contacts', { method: 'POST', body: JSON.stringify(body) });
   }
 
-  async getWallet() {
-    return this.request<any>('/users/wallet');
-  }
-
   // Rides
   async searchRides(params: Record<string, any>) {
     // Filter out undefined/null/empty params

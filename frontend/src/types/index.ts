@@ -11,12 +11,6 @@ export interface User {
   ratingAvg: number | string;
   ratingCount: number;
   isActive: boolean;
-  wallet?: {
-    id: string;
-    currency: string;
-    currentBalance: number | string;
-    lockedEscrowBalance: number | string;
-  };
   emergencyContacts?: EmergencyContact[];
   riderProfile?: RiderProfile;
 }

@@ -135,10 +135,10 @@ export const MyTrips: React.FC = () => {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
           My Commute Trips
         </h1>
-        <p className="text-xs sm:text-sm text-slate-400">
+        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
           Manage your booked pillion rides and published host schedules
         </p>
       </div>
@@ -232,7 +232,7 @@ export const MyTrips: React.FC = () => {
                       </span>
                     </div>
 
-                    <div className="text-sm font-bold text-white">
+                    <div className="text-sm font-bold text-slate-900 dark:text-white">
                       Host: {booking.ride?.riderProfile?.user?.fullName || 'Verified Rider'}
                     </div>
 
@@ -318,7 +318,7 @@ export const MyTrips: React.FC = () => {
                     <span className="text-xs text-slate-400">
                       Departure: {formatDate(ride.scheduledDeparture)}
                     </span>
-                    <h3 className="text-sm font-bold text-white mt-0.5">
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white mt-0.5">
                       {ride.originAddress} &rarr; {ride.destinationAddress}
                     </h3>
                   </div>
@@ -394,7 +394,7 @@ export const MyTrips: React.FC = () => {
                                   {b.passenger?.fullName?.slice(0, 2).toUpperCase() || 'PA'}
                                 </div>
                                 <div>
-                                  <div className="font-bold text-sm text-white flex items-center gap-2">
+                                  <div className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
                                     <span>{b.passenger?.fullName || 'Passenger'}</span>
                                     <span className="text-xs font-semibold text-amber-400">
                                       ★ {Number(b.passenger?.ratingAvg || 5.0).toFixed(1)}
@@ -480,7 +480,7 @@ export const MyTrips: React.FC = () => {
                                   {b.passenger?.fullName?.slice(0, 2).toUpperCase() || 'PA'}
                                 </div>
                                 <div>
-                                  <div className="font-bold text-sm text-white flex items-center gap-2">
+                                  <div className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
                                     <span>{b.passenger?.fullName || 'Passenger'}</span>
                                     <span className="text-xs font-semibold text-amber-400">
                                       ★ {Number(b.passenger?.ratingAvg || 5.0).toFixed(1)}
@@ -574,7 +574,7 @@ export const MyTrips: React.FC = () => {
                             <div className="space-y-1">
                               <div className="flex items-center gap-2">
                                 <span className="w-2.5 h-2.5 rounded-full bg-blue-400 animate-pulse" />
-                                <span className="font-bold text-sm text-white">
+                                <span className="font-bold text-sm text-slate-900 dark:text-white">
                                   Ride In-Progress with {b.passenger?.fullName || 'Passenger'}
                                 </span>
                                 <Badge variant="warning">STARTED</Badge>
@@ -608,7 +608,7 @@ export const MyTrips: React.FC = () => {
                         >
                           <div className="space-y-1">
                             <div className="flex items-center gap-2">
-                              <span className="font-bold text-xs sm:text-sm text-white">
+                              <span className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
                                 {b.passenger?.fullName || 'Passenger'}
                               </span>
                               <Badge

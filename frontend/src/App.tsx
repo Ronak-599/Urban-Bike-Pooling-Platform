@@ -17,7 +17,6 @@ import { OfferRide } from './pages/OfferRide.js';
 import { RideDetails } from './pages/RideDetails.js';
 import { BookingConfirmation } from './pages/BookingConfirmation.js';
 import { MyTrips } from './pages/MyTrips.js';
-import { Wallet } from './pages/Wallet.js';
 import { Profile } from './pages/Profile.js';
 import { Reviews } from './pages/Reviews.js';
 
@@ -76,14 +75,6 @@ export const App: React.FC = () => {
                 element={
                   <ProtectedRoute>
                     <MyTrips />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/wallet"
-                element={
-                  <ProtectedRoute>
-                    <Wallet />
                   </ProtectedRoute>
                 }
               />

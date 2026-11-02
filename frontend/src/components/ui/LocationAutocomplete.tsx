@@ -184,7 +184,7 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
         <label
           className={cn(
             'block text-[11px] font-bold uppercase tracking-wider mb-0.5 select-none',
-            isBlaBlaCar ? 'text-slate-500' : 'text-slate-400'
+            isBlaBlaCar ? 'text-slate-600 dark:text-slate-400' : 'text-slate-700 dark:text-slate-300'
           )}
         >
           {label}
@@ -216,7 +216,7 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
           className={cn(
             'w-full transition-all focus:outline-none',
             isBlaBlaCar
-              ? 'h-10 text-slate-900 dark:text-slate-900 font-semibold text-sm sm:text-base placeholder:text-slate-400 placeholder:font-normal bg-transparent'
+              ? 'h-10 text-slate-900 dark:text-slate-100 font-semibold text-sm sm:text-base placeholder:text-slate-400 dark:placeholder:text-slate-500 placeholder:font-normal bg-transparent'
               : 'h-11 pl-9 pr-9 rounded-xl glass-input text-xs sm:text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500',
             icon && (isBlaBlaCar ? 'pl-8' : 'pl-9'),
             inputValue && 'pr-8',
@@ -259,7 +259,7 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
             'absolute top-[calc(100%+8px)] left-0 z-[100] rounded-2xl shadow-2xl shadow-slate-950/25 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150',
             dropdownWidth ? dropdownWidth : 'min-w-[320px] sm:min-w-[400px] w-full sm:w-[420px]',
             isBlaBlaCar
-              ? 'bg-white border border-slate-200/90 text-slate-900'
+              ? 'bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 text-slate-900 dark:text-white'
               : 'bg-white dark:bg-slate-900/98 backdrop-blur-2xl border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white'
           )}
         >
@@ -268,7 +268,7 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
             className={cn(
               'px-5 py-2.5 flex items-center justify-between text-[11px] font-bold uppercase tracking-wider border-b',
               isBlaBlaCar
-                ? 'bg-slate-50 border-slate-100 text-slate-500'
+                ? 'bg-slate-50 dark:bg-slate-950/60 border-slate-100 dark:border-slate-800 text-slate-500 dark:text-slate-400'
                 : 'bg-slate-50 dark:bg-slate-950/60 border-slate-200 dark:border-slate-800/80 text-slate-600 dark:text-slate-400'
             )}
           >
@@ -292,7 +292,7 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
           <div
             className={cn(
               'max-h-80 overflow-y-auto divide-y',
-              isBlaBlaCar ? 'divide-slate-100' : 'divide-slate-200 dark:divide-slate-800/40'
+              isBlaBlaCar ? 'divide-slate-100 dark:divide-slate-800/50' : 'divide-slate-200 dark:divide-slate-800/40'
             )}
           >
             {suggestions.length > 0 ? (
@@ -307,8 +307,8 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
                       'px-5 py-3.5 sm:py-4 flex items-center justify-between cursor-pointer transition-colors group',
                       isBlaBlaCar
                         ? isSelected
-                          ? 'bg-slate-100 text-slate-950'
-                          : 'hover:bg-slate-50 text-slate-800'
+                          ? 'bg-slate-100 dark:bg-slate-800 text-slate-950 dark:text-white'
+                          : 'hover:bg-slate-50 dark:hover:bg-slate-800/60 text-slate-800 dark:text-slate-200'
                         : isSelected
                         ? 'bg-slate-100 dark:bg-slate-800/95 text-slate-900 dark:text-white'
                         : 'hover:bg-slate-50 dark:hover:bg-slate-800/60 text-slate-700 dark:text-slate-200'
@@ -319,7 +319,7 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
                         className={cn(
                           'mt-0.5 p-1.5 rounded-lg flex-shrink-0 transition-colors',
                           isBlaBlaCar
-                            ? 'bg-slate-100 text-slate-600 group-hover:bg-blue-50 group-hover:text-blue-600'
+                            ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/30 group-hover:text-blue-600 dark:group-hover:text-blue-400'
                             : 'bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/60 text-emerald-600 dark:text-emerald-400'
                         )}
                       >
@@ -331,7 +331,7 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
                           className={cn(
                             'text-sm sm:text-[15px] font-bold truncate leading-tight',
                             isBlaBlaCar
-                              ? 'text-slate-900 group-hover:text-black'
+                              ? 'text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400'
                               : 'text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-300'
                           )}
                         >
@@ -340,7 +340,7 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
                         <div
                           className={cn(
                             'text-xs sm:text-[13px] truncate font-normal leading-tight',
-                            isBlaBlaCar ? 'text-slate-500' : 'text-slate-500 dark:text-slate-400'
+                            isBlaBlaCar ? 'text-slate-500 dark:text-slate-400' : 'text-slate-500 dark:text-slate-400'
                           )}
                         >
                           {item.subtitle}
@@ -355,8 +355,8 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
                           'w-4 h-4 transition-all duration-150',
                           isBlaBlaCar
                             ? isSelected
-                              ? 'text-slate-900 translate-x-0.5'
-                              : 'text-slate-400 group-hover:text-slate-700 group-hover:translate-x-0.5'
+                              ? 'text-slate-900 dark:text-slate-100 translate-x-0.5'
+                              : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-200 group-hover:translate-x-0.5'
                             : isSelected
                             ? 'text-emerald-400 translate-x-0.5'
                             : 'text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-0.5'

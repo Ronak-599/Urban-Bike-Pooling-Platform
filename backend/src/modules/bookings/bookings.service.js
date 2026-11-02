@@ -31,7 +31,29 @@ export class BookingsService {
         const fare = calculateStatutoryCostShare(tripDistance, Number(ride.perKmCostShare));
         // Generate random 4-digit numeric OTP for pickup verification
         const pickupOtp = Math.floor(1000 + Math.random() * 9000).toString();
-        const booking = await prisma.booking.create({
+
+        // Atomic conditional seat allocation inside a multi-document transaction:
+        // Guarantees only one passenger can book at a time by atomically decrementing
+        // availableSeats WHERE availableSeats >= 1 and status == 'SCHEDULED'.
+        // If two passengers book simultaneously, only one succeeds; the second receives ConflictError.
+        // Once booked (availableSeats=0), the ride is immediately hidden from other passengers in search.
+        const booking = await prisma.$transaction(async (tx) => {
+            const seatClaim = await tx.ride.updateMany({
+                where: {
+                    id: input.rideId,
+                    status: 'SCHEDULED',
+                    availableSeats: { gte: 1 },
+                },
+                data: {
+                    availableSeats: { decrement: 1 },
+                },
+            });
+
+            if (seatClaim.count === 0) {
+                throw new ConflictError('This ride has already been booked by another passenger or is no longer available');
+            }
+
+            return tx.booking.create({
             data: {
                 rideId: input.rideId,
                 passengerId,
@@ -60,6 +82,7 @@ export class BookingsService {
                     },
                 },
             },
+        });
         });
         // Notify host rider of incoming booking request
         await prisma.notification.create({
@@ -122,6 +145,11 @@ export class BookingsService {
                         status: 'REJECTED',
                         cancellationReason: 'Rider declined the booking request',
                     },
+                });
+                // Restore seat on ride offer so other passengers can see and book it again
+                await tx.ride.update({
+                    where: { id: booking.rideId },
+                    data: { availableSeats: { increment: 1 } },
                 });
                 // Notify passenger of decline
                 await tx.notification.create({
@@ -223,13 +251,6 @@ export class BookingsService {
                         transferredAt: new Date(),
                     },
                 });
-                // Credit rider wallet balance with fuel share
-                await tx.wallet.update({
-                    where: { userId },
-                    data: {
-                        currentBalance: { increment: booking.payment.riderPayout },
-                    },
-                });
             }
             return completedBooking;
         });
@@ -260,11 +281,13 @@ export class BookingsService {
                     cancellationReason: input.reason || (isPassenger ? 'Passenger cancelled' : 'Rider cancelled'),
                 },
             });
-            // Restore seat on ride offer
-            await tx.ride.update({
-                where: { id: booking.rideId },
-                data: { availableSeats: 1 },
-            });
+            // Restore seat on ride offer if booking was holding a seat
+            if (['REQUESTED', 'CONFIRMED'].includes(booking.status)) {
+                await tx.ride.update({
+                    where: { id: booking.rideId },
+                    data: { availableSeats: 1 },
+                });
+            }
             return cancelledBooking;
         });
     }

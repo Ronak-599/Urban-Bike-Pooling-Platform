@@ -16,28 +16,17 @@ export class AuthService {
             throw new ConflictError('User with this phone number or email already exists');
         }
         const passwordHash = await bcrypt.hash(input.password, 10);
-        // Create user and initialize commuter wallet
-        const user = await prisma.$transaction(async (tx) => {
-            const createdUser = await tx.user.create({
-                data: {
-                    phoneNumber: input.phoneNumber,
-                    fullName: input.fullName,
-                    email: input.email,
-                    passwordHash,
-                    gender: input.gender,
-                    role: input.role,
-                    isPhoneVerified: true, // Auto-verify on registration demo
-                },
-            });
-            // Create linked wallet
-            await tx.wallet.create({
-                data: {
-                    userId: createdUser.id,
-                    currency: 'INR',
-                    currentBalance: 0.0,
-                },
-            });
-            return createdUser;
+        // Create user
+        const user = await prisma.user.create({
+            data: {
+                phoneNumber: input.phoneNumber,
+                fullName: input.fullName,
+                email: input.email,
+                passwordHash,
+                gender: input.gender,
+                role: input.role,
+                isPhoneVerified: true, // Auto-verify on registration demo
+            },
         });
         const tokenPayload = {
             userId: user.id,
