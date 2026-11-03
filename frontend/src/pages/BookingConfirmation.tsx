@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api.js';
 import { Booking } from '../types/index.js';
 import { useSocket } from '../hooks/useSocket.js';
+import { TripChat } from '../components/TripChat.js';
 import { Card, CardContent } from '../components/ui/card.js';
 import { Button } from '../components/ui/button.js';
 import { Badge } from '../components/ui/badge.js';
@@ -23,6 +24,9 @@ import {
   AlertTriangle,
   UserCheck,
   Ban,
+  MessageCircle,
+  Copy,
+  Check,
 } from 'lucide-react';
 
 export const BookingConfirmation: React.FC = () => {
@@ -32,6 +36,7 @@ export const BookingConfirmation: React.FC = () => {
   const [paying, setPaying] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [copiedPhone, setCopiedPhone] = useState(false);
 
   const { data: booking, isLoading, refetch } = useQuery<Booking>({
     queryKey: ['booking', bookingId],
@@ -40,7 +45,14 @@ export const BookingConfirmation: React.FC = () => {
     refetchInterval: 3000, // Poll status every 3 seconds for instant real-time sync
   });
 
-  const { isConnected, riderLocation, triggerSos } = useSocket(bookingId);
+  const { isConnected, riderLocation, triggerSos, liveBookingStatus } = useSocket(bookingId);
+
+  // Sync refetch whenever socket notifies of real-time status update (e.g. host approval)
+  useEffect(() => {
+    if (liveBookingStatus) {
+      refetch();
+    }
+  }, [liveBookingStatus, refetch]);
 
   const handlePayNow = async () => {
     setPaying(true);
@@ -220,6 +232,17 @@ export const BookingConfirmation: React.FC = () => {
               Your 4-digit pickup verification PIN will be revealed here automatically as soon as {rider?.fullName || 'the host'} accepts your booking.
             </p>
           </Card>
+
+          {/* Locked Chat & Contact Card */}
+          <Card className="glass-panel border-amber-500/20 p-5 text-center space-y-2">
+            <div className="flex items-center justify-center gap-1.5 text-xs uppercase font-bold tracking-wider text-amber-500 dark:text-amber-400">
+              <Lock className="w-4 h-4" />
+              <span>Real-Time Chat & Contact (Locked)</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400 max-w-md mx-auto">
+              Direct real-time chat and host phone number will unlock right here as soon as {rider?.fullName || 'the host'} confirms your seat.
+            </p>
+          </Card>
         </div>
       )}
 
@@ -343,14 +366,48 @@ export const BookingConfirmation: React.FC = () => {
             <span className="font-bold text-slate-900 dark:text-white text-sm">{rider?.fullName}</span>
             <div className="flex items-center gap-2 mt-0.5">
               <span className="text-amber-500 font-semibold">★ {Number(rider?.ratingAvg || 5).toFixed(1)}</span>
-              {isConfirmed && rider?.phoneNumber && (
-                <a
-                  href={`tel:${rider.phoneNumber}`}
-                  className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 font-medium flex items-center gap-1 ml-2"
-                >
-                  <Phone className="w-3 h-3" />
-                  <span>Call Rider</span>
-                </a>
+            </div>
+
+            {/* Revealed Host Phone Number */}
+            <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800/80">
+              <span className="text-slate-500 block text-[11px] font-semibold uppercase tracking-wider mb-1">
+                Rider Contact Number
+              </span>
+              {isConfirmed || isStarted ? (
+                rider?.phoneNumber ? (
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <a
+                      href={`tel:${rider.phoneNumber}`}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-mono font-bold text-xs hover:bg-emerald-500/25 transition-colors border border-emerald-500/25"
+                    >
+                      <Phone className="w-3.5 h-3.5" />
+                      <span>{rider.phoneNumber}</span>
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(rider.phoneNumber!);
+                        setCopiedPhone(true);
+                        setTimeout(() => setCopiedPhone(false), 2000);
+                      }}
+                      className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
+                      title="Copy Phone Number"
+                    >
+                      {copiedPhone ? (
+                        <Check className="w-3.5 h-3.5 text-emerald-500" />
+                      ) : (
+                        <Copy className="w-3.5 h-3.5" />
+                      )}
+                    </button>
+                  </div>
+                ) : (
+                  <span className="text-xs text-slate-400">Contact verified</span>
+                )
+              ) : (
+                <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400 font-medium bg-amber-500/10 p-2 rounded-lg border border-amber-500/20">
+                  <Lock className="w-3.5 h-3.5 shrink-0" />
+                  <span>Revealed once host accepts booking</span>
+                </div>
               )}
             </div>
           </div>
@@ -377,6 +434,36 @@ export const BookingConfirmation: React.FC = () => {
           </div>
         </div>
       </Card>
+
+      {/* Real-Time Socket.IO Chat (Visible ONLY when ride is confirmed or ongoing) */}
+      {['CONFIRMED', 'ARRIVED', 'STARTED', 'COMPLETED'].includes(booking.status) && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                <MessageCircle className="w-4 h-4 text-emerald-500" />
+                <span>Live Curbside Chat</span>
+              </h3>
+            </div>
+            <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+              Real-time Socket.IO Sync
+            </span>
+          </div>
+
+          <TripChat
+            bookingId={booking.id}
+            bookingStatus={booking.status}
+            otherUser={{
+              id: rider?.id,
+              fullName: rider?.fullName,
+              phoneNumber: rider?.phoneNumber,
+              avatarUrl: rider?.avatarUrl,
+              roleLabel: 'Host Rider',
+            }}
+          />
+        </div>
+      )}
 
       {/* Payment & Escrow Card */}
       {!isRejected && !isCancelled && (

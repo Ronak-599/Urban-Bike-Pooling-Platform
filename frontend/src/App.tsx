@@ -7,6 +7,7 @@ import { useAuthStore } from './store/useAuthStore.js';
 import { Navbar } from './components/Navbar.js';
 import { Footer } from './components/Footer.js';
 import { ProtectedRoute } from './components/ProtectedRoute.js';
+import { GlobalChatNotification } from './components/GlobalChatNotification.js';
 
 // 11 Pages
 import { Home } from './pages/Home.js';
@@ -100,6 +101,7 @@ export const App: React.FC = () => {
             </Routes>
           </main>
           <Footer />
+          <GlobalChatNotification />
         </div>
       </Router>
     </QueryClientProvider>

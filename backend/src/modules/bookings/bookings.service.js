@@ -1,6 +1,7 @@
 import { prisma } from '../../config/prisma.js';
 import { BadRequestError, NotFoundError, ForbiddenError, ConflictError } from '../../errors/app.error.js';
 import { calculateDistanceMeters, calculateStatutoryCostShare } from '../../utils/spatial.util.js';
+import { notifyBookingStatus, getIO } from '../../sockets/tracking.socket.js';
 export class BookingsService {
     async createBooking(passengerId, input) {
         const ride = await prisma.ride.findUnique({
@@ -111,7 +112,7 @@ export class BookingsService {
         if (booking.status !== 'REQUESTED') {
             throw new BadRequestError(`Cannot respond to booking with status: ${booking.status}`);
         }
-        return prisma.$transaction(async (tx) => {
+        const result = await prisma.$transaction(async (tx) => {
             if (action === 'ACCEPT') {
                 const updatedBooking = await tx.booking.update({
                     where: { id: bookingId },
@@ -165,6 +166,12 @@ export class BookingsService {
                 return rejectedBooking;
             }
         });
+        if (action === 'ACCEPT') {
+            notifyBookingStatus(bookingId, booking.passengerId, 'CONFIRMED');
+        } else {
+            notifyBookingStatus(bookingId, booking.passengerId, 'REJECTED');
+        }
+        return result;
     }
     async markArrived(userId, bookingId) {
         const booking = await prisma.booking.findUnique({
@@ -177,10 +184,12 @@ export class BookingsService {
         if (booking.status !== 'CONFIRMED') {
             throw new BadRequestError('Booking must be CONFIRMED before marking arrived');
         }
-        return prisma.booking.update({
+        const updated = await prisma.booking.update({
             where: { id: bookingId },
             data: { status: 'ARRIVED' },
         });
+        notifyBookingStatus(bookingId, booking.passengerId, 'ARRIVED');
+        return updated;
     }
     async verifyOtpAndStart(userId, bookingId, enteredOtp) {
         const booking = await prisma.booking.findUnique({
@@ -196,7 +205,7 @@ export class BookingsService {
         if (booking.pickupOtp !== enteredOtp) {
             throw new BadRequestError('Invalid pickup OTP entered');
         }
-        return prisma.$transaction(async (tx) => {
+        const started = await prisma.$transaction(async (tx) => {
             const startedBooking = await tx.booking.update({
                 where: { id: bookingId },
                 data: {
@@ -210,6 +219,8 @@ export class BookingsService {
             });
             return startedBooking;
         });
+        notifyBookingStatus(bookingId, booking.passengerId, 'STARTED');
+        return started;
     }
     async completeRide(userId, bookingId) {
         const booking = await prisma.booking.findUnique({
@@ -225,7 +236,7 @@ export class BookingsService {
         if (booking.status !== 'STARTED') {
             throw new BadRequestError('Ride must be STARTED to complete');
         }
-        return prisma.$transaction(async (tx) => {
+        const completed = await prisma.$transaction(async (tx) => {
             const completedBooking = await tx.booking.update({
                 where: { id: bookingId },
                 data: {
@@ -254,6 +265,8 @@ export class BookingsService {
             }
             return completedBooking;
         });
+        notifyBookingStatus(bookingId, booking.passengerId, 'COMPLETED');
+        return completed;
     }
     async cancelBooking(userId, bookingId, input) {
         const booking = await prisma.booking.findUnique({
@@ -271,7 +284,7 @@ export class BookingsService {
         if (['COMPLETED', 'CANCELLED', 'REJECTED'].includes(booking.status)) {
             throw new BadRequestError(`Cannot cancel booking with status: ${booking.status}`);
         }
-        return prisma.$transaction(async (tx) => {
+        const cancelled = await prisma.$transaction(async (tx) => {
             const cancelledBooking = await tx.booking.update({
                 where: { id: bookingId },
                 data: {
@@ -290,9 +303,11 @@ export class BookingsService {
             }
             return cancelledBooking;
         });
+        notifyBookingStatus(bookingId, booking.passengerId, 'CANCELLED');
+        return cancelled;
     }
     async getMyBookings(userId) {
-        return prisma.booking.findMany({
+        const bookings = await prisma.booking.findMany({
             where: { passengerId: userId },
             include: {
                 ride: {
@@ -308,6 +323,15 @@ export class BookingsService {
                 payment: true,
             },
             orderBy: { createdAt: 'desc' },
+        });
+
+        // Mask phone number for non-confirmed bookings
+        return bookings.map((b) => {
+            const isConfirmed = ['CONFIRMED', 'ARRIVED', 'STARTED', 'COMPLETED'].includes(b.status);
+            if (!isConfirmed && b.ride?.riderProfile?.user) {
+                b.ride.riderProfile.user.phoneNumber = null;
+            }
+            return b;
         });
     }
     async getBookingById(userId, bookingId) {
@@ -337,6 +361,101 @@ export class BookingsService {
         if (!isAuthorized) {
             throw new ForbiddenError('Access denied to this booking');
         }
+
+        // Phone numbers are revealed ONLY once the ride request is approved & confirmed
+        const isConfirmed = ['CONFIRMED', 'ARRIVED', 'STARTED', 'COMPLETED'].includes(booking.status);
+        if (!isConfirmed) {
+            if (booking.ride?.riderProfile?.user) {
+                booking.ride.riderProfile.user.phoneNumber = null;
+            }
+            if (booking.passenger) {
+                booking.passenger.phoneNumber = null;
+            }
+        }
+
         return booking;
+    }
+    async getBookingMessages(userId, bookingId) {
+        const booking = await prisma.booking.findUnique({
+            where: { id: bookingId },
+            include: { ride: { include: { riderProfile: true } } },
+        });
+        if (!booking) {
+            throw new NotFoundError('Booking not found');
+        }
+        const isPassenger = booking.passengerId === userId;
+        const isRider = booking.ride.riderProfile.userId === userId;
+        if (!isPassenger && !isRider) {
+            throw new ForbiddenError('Unauthorized to view trip messages');
+        }
+        const activeStatuses = ['CONFIRMED', 'ARRIVED', 'STARTED', 'COMPLETED'];
+        if (!activeStatuses.includes(booking.status)) {
+            return [];
+        }
+        const messages = await prisma.chatMessage.findMany({
+            where: { bookingId },
+            orderBy: { createdAt: 'asc' },
+            take: 100,
+            include: {
+                sender: { select: { id: true, fullName: true, avatarUrl: true } },
+            },
+        });
+        return messages.map((m) => ({
+            id: m.id,
+            bookingId: m.bookingId,
+            senderId: m.senderId,
+            senderName: m.sender.fullName,
+            senderAvatar: m.sender.avatarUrl,
+            text: m.text,
+            createdAt: m.createdAt.toISOString(),
+        }));
+    }
+    async sendBookingMessage(userId, bookingId, text) {
+        if (!text || typeof text !== 'string' || !text.trim()) {
+            throw new BadRequestError('Message cannot be empty');
+        }
+        const booking = await prisma.booking.findUnique({
+            where: { id: bookingId },
+            include: {
+                ride: { include: { riderProfile: true } },
+                passenger: { select: { id: true, fullName: true, avatarUrl: true } },
+            },
+        });
+        if (!booking) {
+            throw new NotFoundError('Booking not found');
+        }
+        const isPassenger = booking.passengerId === userId;
+        const isRider = booking.ride.riderProfile.userId === userId;
+        if (!isPassenger && !isRider) {
+            throw new ForbiddenError('Not authorized to message this trip');
+        }
+        const activeStatuses = ['CONFIRMED', 'ARRIVED', 'STARTED'];
+        if (!activeStatuses.includes(booking.status)) {
+            throw new BadRequestError('Chat is only accessible once the ride request is confirmed by the host');
+        }
+        const message = await prisma.chatMessage.create({
+            data: {
+                bookingId,
+                senderId: userId,
+                text: text.trim(),
+            },
+            include: {
+                sender: { select: { id: true, fullName: true, avatarUrl: true } },
+            },
+        });
+        const payload = {
+            id: message.id,
+            bookingId,
+            senderId: message.senderId,
+            senderName: message.sender.fullName,
+            senderAvatar: message.sender.avatarUrl,
+            text: message.text,
+            createdAt: message.createdAt.toISOString(),
+        };
+        const io = getIO();
+        if (io) {
+            io.to(`trip:${bookingId}`).emit('RECEIVE_MESSAGE', payload);
+        }
+        return payload;
     }
 }

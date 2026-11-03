@@ -146,6 +146,17 @@ class ApiClient {
     });
   }
 
+  async getBookingMessages(bookingId: string) {
+    return this.request<any[]>(`/bookings/${bookingId}/messages`);
+  }
+
+  async sendBookingMessage(bookingId: string, text: string) {
+    return this.request<any>(`/bookings/${bookingId}/messages`, {
+      method: 'POST',
+      body: JSON.stringify({ text }),
+    });
+  }
+
   // Payments
   async createPaymentOrder(bookingId: string) {
     return this.request<any>('/payments/orders', {

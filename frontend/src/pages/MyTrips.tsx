@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api.js';
 import { Booking, Ride } from '../types/index.js';
+import { TripChat } from '../components/TripChat.js';
 import { Card, CardContent } from '../components/ui/card.js';
 import { Button } from '../components/ui/button.js';
 import { Badge } from '../components/ui/badge.js';
@@ -24,6 +25,9 @@ import {
   Ban,
   AlertCircle,
   CheckCircle2,
+  MessageCircle,
+  Copy,
+  Lock,
 } from 'lucide-react';
 
 export const MyTrips: React.FC = () => {
@@ -34,6 +38,8 @@ export const MyTrips: React.FC = () => {
   const isNewlyPublished = searchParams.get('published') === 'true';
   const [otpInputs, setOtpInputs] = useState<Record<string, string>>({});
   const [actionLoading, setActionLoading] = useState<Record<string, boolean>>({});
+  const [activeChatBookingId, setActiveChatBookingId] = useState<string | null>(null);
+  const [copiedPhoneId, setCopiedPhoneId] = useState<string | null>(null);
 
   // Fetch Passenger Bookings
   const {
@@ -247,10 +253,46 @@ export const MyTrips: React.FC = () => {
                       </div>
                     </div>
 
+                    {/* Revealed Host Phone Number upon confirmation */}
+                    {['CONFIRMED', 'ARRIVED', 'STARTED'].includes(booking.status) && booking.ride?.riderProfile?.user?.phoneNumber && (
+                      <div className="flex items-center gap-2 pt-1">
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">Host Phone:</span>
+                        <a
+                          href={`tel:${booking.ride.riderProfile.user.phoneNumber}`}
+                          className="inline-flex items-center gap-1 font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
+                        >
+                          <Phone className="w-3 h-3" />
+                          <span>{booking.ride.riderProfile.user.phoneNumber}</span>
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(booking.ride!.riderProfile!.user!.phoneNumber!);
+                            setCopiedPhoneId(booking.id);
+                            setTimeout(() => setCopiedPhoneId(null), 2000);
+                          }}
+                          className="text-slate-400 hover:text-slate-200 transition-colors"
+                          title="Copy Phone Number"
+                        >
+                          {copiedPhoneId === booking.id ? (
+                            <Check className="w-3 h-3 text-emerald-500" />
+                          ) : (
+                            <Copy className="w-3 h-3" />
+                          )}
+                        </button>
+                      </div>
+                    )}
+
                     {booking.status === 'REQUESTED' && (
-                      <p className="text-[11px] text-amber-400/90 font-medium">
-                        Request sent to host. Pillion seat and pickup PIN unlock once host accepts.
-                      </p>
+                      <div className="space-y-1">
+                        <p className="text-[11px] text-amber-400/90 font-medium">
+                          Request sent to host. Pillion seat and pickup PIN unlock once host accepts.
+                        </p>
+                        <div className="flex items-center gap-1 text-[11px] text-amber-500 dark:text-amber-400 font-medium">
+                          <Lock className="w-3 h-3 shrink-0" />
+                          <span>Host phone number and chat unlock upon acceptance</span>
+                        </div>
+                      </div>
                     )}
                   </div>
 
@@ -262,7 +304,19 @@ export const MyTrips: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap justify-end">
+                      {['CONFIRMED', 'ARRIVED', 'STARTED', 'COMPLETED'].includes(booking.status) && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setActiveChatBookingId(activeChatBookingId === booking.id ? null : booking.id)}
+                          className={`gap-1.5 text-xs ${activeChatBookingId === booking.id ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400' : ''}`}
+                        >
+                          <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>{activeChatBookingId === booking.id ? 'Close Chat' : 'Chat'}</span>
+                        </Button>
+                      )}
+
                       <Button
                         variant={booking.status === 'CONFIRMED' ? 'primary' : 'secondary'}
                         size="sm"
@@ -290,6 +344,24 @@ export const MyTrips: React.FC = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* Inline Socket.IO Chat for Passenger */}
+                {activeChatBookingId === booking.id && (
+                  <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
+                    <TripChat
+                      bookingId={booking.id}
+                      bookingStatus={booking.status}
+                      otherUser={{
+                        id: booking.ride?.riderProfile?.user?.id,
+                        fullName: booking.ride?.riderProfile?.user?.fullName,
+                        phoneNumber: booking.ride?.riderProfile?.user?.phoneNumber,
+                        avatarUrl: booking.ride?.riderProfile?.user?.avatarUrl,
+                        roleLabel: 'Host Rider',
+                      }}
+                      onClose={() => setActiveChatBookingId(null)}
+                    />
+                  </div>
+                )}
               </Card>
             ))
           ) : (
@@ -403,6 +475,10 @@ export const MyTrips: React.FC = () => {
                                   <div className="text-xs text-slate-400">
                                     Requested on {formatDate(b.requestedAt)}
                                   </div>
+                                  <div className="flex items-center gap-1 text-[11px] text-amber-500/90 font-medium mt-0.5">
+                                    <Lock className="w-3 h-3" />
+                                    <span>Passenger phone & chat unlock once you accept</span>
+                                  </div>
                                 </div>
                               </div>
 
@@ -487,13 +563,31 @@ export const MyTrips: React.FC = () => {
                                     </span>
                                   </div>
                                   {b.passenger?.phoneNumber ? (
-                                    <a
-                                      href={`tel:${b.passenger.phoneNumber}`}
-                                      className="text-xs text-emerald-400 hover:text-emerald-300 font-mono flex items-center gap-1 mt-0.5"
-                                    >
-                                      <Phone className="w-3 h-3" />
-                                      <span>Call {b.passenger.phoneNumber}</span>
-                                    </a>
+                                    <div className="flex items-center gap-2 mt-0.5">
+                                      <a
+                                        href={`tel:${b.passenger.phoneNumber}`}
+                                        className="text-xs text-emerald-400 hover:text-emerald-300 font-mono font-bold flex items-center gap-1"
+                                      >
+                                        <Phone className="w-3 h-3" />
+                                        <span>{b.passenger.phoneNumber}</span>
+                                      </a>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          navigator.clipboard.writeText(b.passenger!.phoneNumber!);
+                                          setCopiedPhoneId(b.id);
+                                          setTimeout(() => setCopiedPhoneId(null), 2000);
+                                        }}
+                                        className="text-slate-400 hover:text-slate-200 transition-colors"
+                                        title="Copy Phone Number"
+                                      >
+                                        {copiedPhoneId === b.id ? (
+                                          <Check className="w-3 h-3 text-emerald-500" />
+                                        ) : (
+                                          <Copy className="w-3 h-3" />
+                                        )}
+                                      </button>
+                                    </div>
                                   ) : (
                                     <span className="text-xs text-slate-400">Contact verified</span>
                                   )}
@@ -526,16 +620,32 @@ export const MyTrips: React.FC = () => {
                             </div>
 
                             <div className="flex items-center justify-between flex-wrap gap-2 pt-2 border-t border-slate-800/80">
-                              {b.status === 'CONFIRMED' && (
+                              <div className="flex items-center gap-2">
+                                {b.status === 'CONFIRMED' && (
+                                  <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    isLoading={actionLoading[b.id]}
+                                    onClick={() => handleMarkArrived(b.id)}
+                                  >
+                                    <span>Mark Arrived at Pickup</span>
+                                  </Button>
+                                )}
+
                                 <Button
-                                  variant="secondary"
+                                  variant="primary"
                                   size="sm"
-                                  isLoading={actionLoading[b.id]}
-                                  onClick={() => handleMarkArrived(b.id)}
+                                  onClick={() => setActiveChatBookingId(activeChatBookingId === b.id ? null : b.id)}
+                                  className={`gap-2 text-xs font-bold ${
+                                    activeChatBookingId === b.id
+                                      ? 'bg-slate-700 hover:bg-slate-600 text-white'
+                                      : 'bg-emerald-600 hover:bg-emerald-500 text-white'
+                                  }`}
                                 >
-                                  <span>Mark Arrived at Pickup</span>
+                                  <MessageCircle className="w-3.5 h-3.5" />
+                                  <span>{activeChatBookingId === b.id ? 'Hide Chat' : 'Chat with Passenger'}</span>
                                 </Button>
-                              )}
+                              </div>
 
                               <div className="flex items-center gap-2 ml-auto">
                                 <span className="text-[11px] text-slate-400">Enter Passenger PIN:</span>
@@ -560,6 +670,24 @@ export const MyTrips: React.FC = () => {
                                 </Button>
                               </div>
                             </div>
+
+                            {/* Inline Socket.IO Chat for Rider */}
+                            {activeChatBookingId === b.id && (
+                              <div className="mt-3 pt-3 border-t border-slate-800">
+                                <TripChat
+                                  bookingId={b.id}
+                                  bookingStatus={b.status}
+                                  otherUser={{
+                                    id: b.passenger?.id,
+                                    fullName: b.passenger?.fullName,
+                                    phoneNumber: b.passenger?.phoneNumber,
+                                    avatarUrl: b.passenger?.avatarUrl,
+                                    roleLabel: 'Passenger',
+                                  }}
+                                  onClose={() => setActiveChatBookingId(null)}
+                                />
+                              </div>
+                            )}
                           </div>
                         );
                       }
@@ -569,33 +697,94 @@ export const MyTrips: React.FC = () => {
                         return (
                           <div
                             key={b.id}
-                            className="p-4 rounded-xl bg-blue-950/20 border border-blue-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                            className="p-4 sm:p-5 rounded-2xl bg-emerald-950/20 border-2 border-emerald-500/40 space-y-3.5 shadow-md"
                           >
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-2">
-                                <span className="w-2.5 h-2.5 rounded-full bg-blue-400 animate-pulse" />
-                                <span className="font-bold text-sm text-slate-900 dark:text-white">
-                                  Ride In-Progress with {b.passenger?.fullName || 'Passenger'}
-                                </span>
-                                <Badge variant="warning">STARTED</Badge>
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                              <div className="space-y-1.5">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                                  <span className="font-bold text-sm text-slate-900 dark:text-white">
+                                    Ride In-Progress with {b.passenger?.fullName || 'Passenger'}
+                                  </span>
+                                  <Badge variant="warning">STARTED</Badge>
+                                </div>
+                                <div className="text-xs text-slate-500 dark:text-slate-400">
+                                  Dropping off at: <span className="font-medium text-slate-700 dark:text-slate-200">{b.dropoffAddress}</span>
+                                </div>
+                                {b.passenger?.phoneNumber ? (
+                                  <div className="flex items-center gap-2 pt-0.5">
+                                    <span className="text-xs text-slate-400">Passenger Phone:</span>
+                                    <a
+                                      href={`tel:${b.passenger.phoneNumber}`}
+                                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-400 font-mono font-bold text-xs hover:bg-emerald-500/25 transition-colors border border-emerald-500/30"
+                                    >
+                                      <Phone className="w-3 h-3" />
+                                      <span>{b.passenger.phoneNumber}</span>
+                                    </a>
+                                  </div>
+                                ) : (
+                                  <span className="text-xs text-slate-400">Verified Contact</span>
+                                )}
+                                <div className="text-xs font-bold text-emerald-400">
+                                  Payout upon dropoff: {formatCurrency(b.fareFuelShare)}
+                                </div>
                               </div>
-                              <div className="text-xs text-slate-400">
-                                Dropping off at: {b.dropoffAddress}
-                              </div>
-                              <div className="text-xs font-bold text-emerald-400">
-                                Payout upon dropoff: {formatCurrency(b.fareFuelShare)}
+
+                              <div className="flex items-center gap-2 flex-wrap sm:justify-end">
+                                <Button
+                                  variant="primary"
+                                  size="sm"
+                                  onClick={() => setActiveChatBookingId(activeChatBookingId === b.id ? null : b.id)}
+                                  className={`gap-2 text-xs font-bold ${
+                                    activeChatBookingId === b.id
+                                      ? 'bg-slate-700 hover:bg-slate-600 text-white'
+                                      : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-glow'
+                                  }`}
+                                >
+                                  <MessageCircle className="w-4 h-4" />
+                                  <span>{activeChatBookingId === b.id ? 'Hide Chat' : 'Chat with Passenger'}</span>
+                                </Button>
+
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => navigate(`/booking/${b.id}`)}
+                                  className="text-xs gap-1"
+                                >
+                                  <span>Full View</span>
+                                  <ArrowRight className="w-3 h-3" />
+                                </Button>
+
+                                <Button
+                                  variant="secondary"
+                                  size="sm"
+                                  isLoading={actionLoading[b.id]}
+                                  onClick={() => handleCompleteRide(b.id)}
+                                  className="text-xs font-bold"
+                                >
+                                  <CheckCheck className="w-3.5 h-3.5 mr-1" />
+                                  <span>Complete Ride</span>
+                                </Button>
                               </div>
                             </div>
 
-                            <Button
-                              variant="primary"
-                              size="sm"
-                              isLoading={actionLoading[b.id]}
-                              onClick={() => handleCompleteRide(b.id)}
-                            >
-                              <CheckCheck className="w-3.5 h-3.5 mr-1" />
-                              <span>Complete & Transfer Payout</span>
-                            </Button>
+                            {/* Inline Socket.IO Chat for Ongoing Ride */}
+                            {activeChatBookingId === b.id && (
+                              <div className="mt-3 pt-3 border-t border-slate-800">
+                                <TripChat
+                                  bookingId={b.id}
+                                  bookingStatus={b.status}
+                                  otherUser={{
+                                    id: b.passenger?.id,
+                                    fullName: b.passenger?.fullName,
+                                    phoneNumber: b.passenger?.phoneNumber,
+                                    avatarUrl: b.passenger?.avatarUrl,
+                                    roleLabel: 'Passenger',
+                                  }}
+                                  onClose={() => setActiveChatBookingId(null)}
+                                />
+                              </div>
+                            )}
                           </div>
                         );
                       }

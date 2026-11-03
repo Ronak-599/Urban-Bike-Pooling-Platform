@@ -74,4 +74,22 @@ export class BookingsController {
             next(error);
         }
     }
+    async getBookingMessages(req, res, next) {
+        try {
+            const messages = await bookingsService.getBookingMessages(req.user.userId, req.params.id);
+            sendSuccess(res, messages, 'Messages retrieved');
+        }
+        catch (error) {
+            next(error);
+        }
+    }
+    async sendBookingMessage(req, res, next) {
+        try {
+            const message = await bookingsService.sendBookingMessage(req.user.userId, req.params.id, req.body.text);
+            sendCreated(res, message, 'Message sent successfully');
+        }
+        catch (error) {
+            next(error);
+        }
+    }
 }

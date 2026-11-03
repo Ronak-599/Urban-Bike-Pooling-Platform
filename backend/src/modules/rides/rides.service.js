@@ -374,7 +374,7 @@ export class RidesService {
         if (!riderProfile) {
             return [];
         }
-        return prisma.ride.findMany({
+        const rides = await prisma.ride.findMany({
             where: { riderProfileId: riderProfile.id },
             include: {
                 vehicle: true,
@@ -394,6 +394,20 @@ export class RidesService {
                 },
             },
             orderBy: { scheduledDeparture: 'desc' },
+        });
+
+        // Passenger phone number is revealed ONLY once host accepts & confirms booking
+        return rides.map((ride) => {
+            if (ride.bookings) {
+                ride.bookings = ride.bookings.map((b) => {
+                    const isConfirmed = ['CONFIRMED', 'ARRIVED', 'STARTED', 'COMPLETED'].includes(b.status);
+                    if (!isConfirmed && b.passenger) {
+                        b.passenger.phoneNumber = null;
+                    }
+                    return b;
+                });
+            }
+            return ride;
         });
     }
     async getRideById(rideId) {

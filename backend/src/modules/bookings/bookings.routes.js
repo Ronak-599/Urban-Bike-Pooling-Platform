@@ -14,4 +14,6 @@ router.post('/:id/arrived', controller.markArrived);
 router.post('/:id/verify-otp', validateRequest({ body: verifyOtpSchema }), controller.verifyOtpAndStart);
 router.post('/:id/complete', controller.completeRide);
 router.post('/:id/cancel', validateRequest({ body: cancelBookingSchema }), controller.cancelBooking);
+router.get('/:id/messages', controller.getBookingMessages);
+router.post('/:id/messages', controller.sendBookingMessage);
 export default router;

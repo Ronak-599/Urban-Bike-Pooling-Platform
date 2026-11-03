@@ -107,6 +107,7 @@ model User {
   paymentsMade      Payment[]          @relation("PayerPayments")
   payoutsReceived   Payment[]          @relation("RecipientPayments")
   cancelledBookings Booking[]          @relation("CancelledBy")
+  chatMessages      ChatMessage[]
 
   @@map("users")
 }
@@ -238,6 +239,7 @@ model Booking {
   cancelledBy           User?         @relation("CancelledBy", fields: [cancelledById], references: [id])
   payment               Payment?
   reviews               Review[]
+  chatMessages          ChatMessage[]
 
   @@map("bookings")
 }
@@ -304,4 +306,17 @@ model Notification {
   user             User                @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("notifications")
+}
+
+model ChatMessage {
+  id        String   @id @default(uuid()) @map("_id")
+  bookingId String   @map("booking_id")
+  senderId  String   @map("sender_id")
+  text      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  sender    User     @relation(fields: [senderId], references: [id], onDelete: Restrict)
+
+  @@map("chat_messages")
 }
